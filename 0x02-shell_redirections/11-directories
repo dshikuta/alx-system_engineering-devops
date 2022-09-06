@@ -1,2 +1,2 @@
-#!/bin/bash
-find /path/to/directory/* -type d | wc -1
+b#!/bin/bash
+find /path/to/directory/* -mindepth 1 -type d | wc -1
