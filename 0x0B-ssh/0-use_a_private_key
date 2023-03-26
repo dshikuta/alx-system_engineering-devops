@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-# This script uses ssh to connect to a server using private key
-
+# connect to your server using the private key ~/.ssh/school
+# echo "SSH Public key" >> ~/.ssh/authorized_keys
 ssh -i ~/.ssh/school ubuntu@54.175.170.98
