@@ -1,24 +1,22 @@
-reate a custom header with puppet
-exec {'update':
-  provider => shell,
-  command  => 'sudo apt-get -y update',
-  before   => Exec['install Nginx'],
+#!/usr/bin/env bash
+# A script that displays domain dns informations for a domain
+domaininfo () {
+	answer_section=$(dig "$1" | grep -A1 'ANSWER SECTION' | tail -n 1)
+
+	subdomain=$(echo "$answer_section" | awk '{print $1;}' FS=.) 
+	record_type=$(echo "$answer_section" | awk '{print $4;}')
+	ip_address=$(echo "$answer_section" | awk '{print $5}')
+
+	echo "The subdomain $subdomain is a $record_type record and points to $ip_address" 
 }
 
-exec {'install Nginx':
-  provider => shell,
-  command  => 'sudo apt-get -y install nginx',
-  before   => Exec['add_header'],
-}
-
-exec { 'add_header':
-  provider    => shell,
-  environment => ["HOST=${hostname}"],
-  command     => 'sudo sed -i "s/include \/etc\/nginx\/sites-enabled\/\*;/include \/etc\/nginx\/sites-enabled\/\*;\n\tadd_header X-Served-By \"$HOST\";/" /etc/nginx/nginx.conf',
-  before      => Exec['restart Nginx'],
-}
-
-exec { 'restart Nginx':
-  provider => shell,
-  command  => 'sudo service nginx restart',
-}
+if [ $# -eq 1 ]
+then
+	domaininfo "www.$1" 
+	domaininfo "lb-01.$1"
+	domaininfo "web-01.$1"
+	domaininfo "web-02.$1"
+elif [ $# -eq 2 ]
+then
+	domaininfo "$2.$1"
+fi
